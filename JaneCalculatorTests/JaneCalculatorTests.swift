@@ -21,41 +21,23 @@ class JaneCalculatorTests: XCTestCase {
         super.tearDown()
     }
     
-    func testDivide() {
+    func testSetValue() {
         let calc = Calculator()
-        // Test division with ints
-        calc.setValue(10)
-        calc.calculate(.divide, operand:2)
+        let input = Double(arc4random_uniform(1000))
+        print(input)
+        calc.setValue(input)
         
-        XCTAssertEqual(5, calc.currentValue)
-        
-        // Test division with a double & a negative number
-        // Will return false until bug is fixed. 
-        calc.setValue(-30.5)
-        calc.calculate(.divide, operand: 2)
-        XCTAssertEqual(-15.25, calc.currentValue)
+        XCTAssertEqual(input, calc.currentValue)
     }
     
-    // test getting a result that contains a decimal
-    func testDivideDoubleResult() {
+    func testClear() {
         let calc = Calculator()
-        calc.setValue(20)
-        calc.calculate(.divide, operand: 8)
+        calc.setValue(105.5)
+        calc.clear()
         
-        XCTAssertEqual(2.5, calc.currentValue)
+        XCTAssertEqual(0, calc.currentValue)
     }
     
-    func testLargeNumberDivide() {
-        let calc = Calculator()
-        calc.setValue(9223372036854775808) // Int.max plus 1
-        calc.calculate(.divide, operand: 100)
-        // Test that will fail if number is too big (with program as currently stands)
-        XCTAssertGreaterThanOrEqual(Int.max, Int(calc.currentValue))
-
-        // Following test should fail until code is fixed to allow numbers larger than Int.max to be used in division operations.
-        XCTAssertEqual(92233720368547758.08, calc.currentValue, "Unable to use such a large number in current format")
-}
-
     func testAddition() {
         let calc = Calculator()
         // simple addition
@@ -93,20 +75,49 @@ class JaneCalculatorTests: XCTestCase {
         XCTAssertEqual(5, calc.currentValue)
     }
     
-    func testClear() {
+    func testDivide() {
         let calc = Calculator()
-        calc.setValue(105.5)
-        calc.clear()
+        // Test division with ints
+        calc.setValue(10)
+        calc.calculate(.divide, operand:2)
         
-        XCTAssertEqual(0, calc.currentValue)
+        XCTAssertEqual(5, calc.currentValue)
     }
     
-    func testSetValue() {
+    // Test division with a decimal & a negative number
+    func testDivideWithDecimal() {
         let calc = Calculator()
-        let input = Double(arc4random_uniform(1000))
-        print(input)
-        calc.setValue(input)
-        
-        XCTAssertEqual(input, calc.currentValue)
+        calc.setValue(-30.5)
+        calc.calculate(.divide, operand: 2)
+        // Will FAIL test until bug is fixed
+        XCTAssertEqual(-15.25, calc.currentValue)
+    }
+    
+    // test getting a result that contains a decimal
+    func testDivideDoubleResult() {
+        let calc = Calculator()
+        calc.setValue(20)
+        calc.calculate(.divide, operand: 8)
+        // Will FAIL test until bug is fixed
+        XCTAssertEqual(2.5, calc.currentValue)
+    }
+
+    // Test that number is within Int maximum value
+    func testNumberWithinIntSize() {
+        let calc = Calculator()
+        calc.setValue(922337203685477580) // Int.max minus the last digit
+        calc.calculate(.divide, operand: 100)
+        // Test will pass if number is not bigger than Int.max
+        XCTAssertGreaterThanOrEqual(Int.max, Int(calc.currentValue))
+    }
+
+    // WILL CRASH THE APP UNTIL THE BUG IS FIXED
+    func testLargeNumberDivide() {
+        let calc = Calculator()
+        calc.setValue(9223372036854775808) // Int.max plus 1
+        calc.calculate(.divide, operand: 100)
+
+        // Following test should FAIL UNTIL code is fixed to allow numbers larger than Int.max to be used in division operations, then it should pass.
+        XCTAssertEqual(92233720368547758.08, calc.currentValue, "Unable to use such a large number in current format")
     }
 }

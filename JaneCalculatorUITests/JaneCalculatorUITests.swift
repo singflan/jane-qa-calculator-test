@@ -81,38 +81,151 @@ class JaneCalculatorUITests: XCTestCase {
         decimalButton.tap()
         twoButton.tap()
         XCTAssertEqual(Double(1234567890.2), Double(totalNumberLabel.label))
-        
-        
-//        divideButton.tap()
-//        XCTAssertEqual("/", Double(totalNumberLabel.label))
-//        multiplyButton.tap()
-//        XCTAssertEqual(Double(1), Double(totalNumberLabel.label))
-//        addButton.tap()
-//        XCTAssertEqual(Double(1), Double(totalNumberLabel.label))
-//        subtractButton.tap()
-//        XCTAssertEqual(Double(1), Double(totalNumberLabel.label))
-        
-        
-    }
-    
-    func testAddButton() {
-        
-    }
-    
-    func testSubtractButton() {
-        
-    }
-    
-    func testMultiplyButton() {
-        
-    }
-    
-    func testDivideButton() {
-        
     }
     
     func testClearButton() {
+        oneButton.tap()
+        threeButton.tap()
+        XCTAssertEqual(Double(13), Double(totalNumberLabel.label))
         
+        clearButton.tap()
+        XCTAssertEqual(Double(0), Double(totalNumberLabel.label))
     }
     
+    func testAddButton() {
+        XCTAssert(addButton.exists)
+        addButton.tap()
+        XCTAssertNotEqual("+", String(totalNumberLabel.label))
+        // we don't need to reset to zero here since adding our number to zero just returns the number we want
+        
+        // 2 + 5 = 7
+        twoButton.tap()
+        addButton.tap()
+        fiveButton.tap()
+        equalsButton.tap()
+        XCTAssertEqual(Double(7), Double(totalNumberLabel.label))
+    }
+    
+    func testSubtractButton() {
+        XCTAssert(subtractButton.exists)
+        subtractButton.tap()
+        XCTAssertNotEqual("-", String(totalNumberLabel.label))
+        
+        // due to current calculator design, need to press equals after pressing subtract button so we don't subtract the next number from zero.
+        equalsButton.tap()
+        
+        // 10 - 4.5 = 5.5
+        oneButton.tap()
+        zeroButton.tap()
+        subtractButton.tap()
+        fourButton.tap()
+        decimalButton.tap()
+        fiveButton.tap()
+        equalsButton.tap()
+        XCTAssertEqual(Double(5.5), Double(totalNumberLabel.label))
+    }
+    
+    func testMultiplyButton() {
+        XCTAssert(multiplyButton.exists)
+        multiplyButton.tap()
+        XCTAssertNotEqual("*", String(totalNumberLabel.label))
+        
+        // due to current calculator design, need to press zero & equals after pressing multiply button so we don't multiply the next number by zero.
+        zeroButton.tap()
+        equalsButton.tap()
+        
+        // 11 * 5 = 55
+        oneButton.tap()
+        oneButton.tap()
+        multiplyButton.tap()
+        fiveButton.tap()
+        equalsButton.tap()
+        XCTAssertEqual(Double(55), Double(totalNumberLabel.label))
+    }
+    
+    func testDivideButton() {
+        XCTAssert(divideButton.exists)
+        divideButton.tap()
+        XCTAssertNotEqual("/", String(totalNumberLabel.label))
+        
+        // due to current calculator design, need to press '+' & equals after pressing divide button so we don't divide the next number by zero and cause a crash
+        addButton.tap()
+        equalsButton.tap()
+        
+        // 100 / 5 = 20
+        oneButton.tap()
+        zeroButton.tap()
+        zeroButton.tap()
+        divideButton.tap()
+        fiveButton.tap()
+        equalsButton.tap()
+        XCTAssertEqual(Double(20), Double(totalNumberLabel.label))
+        
+        // Testing current functionality. TODO: Change this test when bug is fixed to divide by doubles
+        // For now expecting 20 / 9 = 2.0 since dividend & divisor are rounded to the nearest integer before the transaction is performed
+        clearButton.tap()
+        twoButton.tap()
+        zeroButton.tap()
+        divideButton.tap()
+        nineButton.tap()
+        equalsButton.tap()
+        XCTAssertEqual(Double(2.0), Double(totalNumberLabel.label))
+    }
+    
+    func testAdditionAndSubtractionChaining() {
+        // 5 + 9 - 10 + 1 - 50.5 = -45.5
+        fiveButton.tap()
+        addButton.tap()
+        nineButton.tap()
+        subtractButton.tap()
+        oneButton.tap()
+        zeroButton.tap()
+        addButton.tap()
+        oneButton.tap()
+        subtractButton.tap()
+        fiveButton.tap()
+        zeroButton.tap()
+        decimalButton.tap()
+        fiveButton.tap()
+        equalsButton.tap()
+        XCTAssertEqual(Double(-45.5), Double(totalNumberLabel.label))
+    }
+    
+    func testMultiplyChaining() {
+        // 6 * 2.2 * 3 = 39.6
+        sixButton.tap()
+        multiplyButton.tap()
+        twoButton.tap()
+        decimalButton.tap()
+        twoButton.tap()
+        multiplyButton.tap()
+        threeButton.tap()
+        equalsButton.tap()
+        XCTAssertEqual(Double(39.6), Double(totalNumberLabel.label))
+    }
+  
+    func testUsingClearToChain() {
+        // Pressing clear will clear current value but will chain from where at
+        // 5 + 2 = 7  then 'C' & then - 3 will equal 4
+        fiveButton.tap()
+        addButton.tap()
+        twoButton.tap()
+        equalsButton.tap()
+        XCTAssertEqual(Double(7), Double(totalNumberLabel.label))
+        clearButton.tap()
+        subtractButton.tap()
+        threeButton.tap()
+        equalsButton.tap()
+        XCTAssertEqual(Double(4), Double(totalNumberLabel.label))
+        
+        // this time will do 3 + 6 C * 5 and it will equal 15 since the 6 was cleared
+        threeButton.tap()
+        addButton.tap()
+        sixButton.tap()
+        clearButton.tap()
+        multiplyButton.tap()
+        fiveButton.tap()
+        equalsButton.tap()
+        XCTAssertEqual(Double(15), Double(totalNumberLabel.label))
+    }
 }
